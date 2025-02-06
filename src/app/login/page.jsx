@@ -67,7 +67,7 @@ const LoginPage = () => {
                 return;
             }
             // Set JWT token in local storage
-            localStorage.setItem('jwtToken', req.token);
+            localStorage.setItem('token', req.token);
             alert("Login succeful!")
             // Redirect to dashboard page
             router.push('/dashboard');

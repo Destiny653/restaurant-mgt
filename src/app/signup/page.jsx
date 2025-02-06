@@ -102,8 +102,7 @@ const RegisterPage = () => {
             const res = await fetch(`${localUrl}/api/staff/add`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}` // add authorization 
+                    'Content-Type': 'application/json' 
                 },
                 body: JSON.stringify(submitData)
             })
