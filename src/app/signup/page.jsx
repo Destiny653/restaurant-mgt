@@ -99,10 +99,16 @@ const RegisterPage = () => {
                 role: formData.role,
                 ...(formData.role === 'Staff' && { salary: Number(formData.salary) })
             };
-            const res = await fetch(`${localUrl}/api/staff/add`, {
+            const apiPath = formData.role; 
+            // for path if owner /create if staff /make if customer /register
+            const path = submitData.role === 'Owner'? 'register-owner' : submitData.role === 'Staff'?'add' :'register'
+            // add authorization header if token exists  // for path if owner /create if staff /make if customer /register
+            const token = localStorage.getItem('token')
+            const res = await fetch(`${localUrl}/api/${apiPath}/${path}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json' 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // add authorization 
                 },
                 body: JSON.stringify(submitData)
             })

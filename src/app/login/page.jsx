@@ -12,6 +12,7 @@ const LoginPage = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
+        role:'customer',
         rememberMe: false
     });
     const [errors, setErrors] = useState({
@@ -45,36 +46,38 @@ const LoginPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const apiPath = formData.role; 
         if (!validateForm()) return;
-
+    
         setIsLoading(true);
         try {
-            // Simulate API call 
-            const res = await fetch(`${localUrl}/api/staff/login`,{
+            const res = await fetch(`${localUrl}/api/${apiPath}/login`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` // Replace with your authentication token
                 },
                 body: JSON.stringify({
                     email: formData.email,
                     password: formData.password
                 })
-            })
-            const req = await res.json()
-            if (!req.ok) { 
-                alert('Login error: '+req.message)
-                console.log('Login error: '+req.message)
+            });
+            const req = await res.json();
+            if (!res.ok) {
+                alert('Login error: ' + req.message);
+                console.log('Login error: ' + req.message);
                 return;
             }
             // Set JWT token in local storage
             localStorage.setItem('token', req.token);
-            alert("Login succeful!")
+            localStorage.setItem('userRole', formData.role.toLowerCase()); // Store user role
+            alert("Login successful!");
             // Redirect to dashboard page
-            router.push('/dashboard');
-            return
+            router.push('/');
+            return;
         } catch (error) {
             console.error('Login error:', error);
-            alert("Internal erro: "+error.message)
+            alert("Internal error: " + error.message);
             return;
         } finally {
             setIsLoading(false);
@@ -83,18 +86,39 @@ const LoginPage = () => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-        // Clear error when user starts typing
-        if (errors) {
+        
+        // For checkbox inputs, use the checked property
+        if (type === 'checkbox') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: checked
+            }));
+        }
+        // For select input (role)
+        else if (name === 'role') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value.toLowerCase() // Store role in lowercase
+            }));
+        }
+        // For all other inputs (email, password)
+        else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
+    
+        // Clear errors when user starts typing
+        if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
                 [name]: ''
             }));
         }
     };
+    
+    
 
     return (
         <div className="flex justify-center items-center bg-gray-50 px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
@@ -124,7 +148,7 @@ const LoginPage = () => {
                             alt="Google"
                         />
                         Continue with Google
-                    </button> 
+                    </button>
                 </div>
 
                 <div className="relative">
@@ -141,6 +165,27 @@ const LoginPage = () => {
                 {/* Login Form */}
                 <form className="space-y-6 mt-8" onSubmit={handleSubmit}>
                     <div className="space-y-4">
+                        {/* Role Selection */}
+                        <div>
+                            <label
+                                htmlFor="role"
+                                className="block font-medium text-gray-700 text-sm"
+                            >
+                                Login as
+                            </label>
+                            <select
+                                id="role"
+                                name="role"
+                                value={formData.role}
+                                onChange={handleChange}
+                                className="block border-gray-300 focus:border-yellow-500 shadow-sm mt-1 px-3 py-2 border rounded-lg focus:ring-yellow-500 w-full focus:outline-none"
+                            >
+                                <option value="customer">Customer</option>
+                                <option value="staff">Staff</option>
+                                <option value="owner">Owner</option>
+                            </select>
+                        </div>
+
                         {/* Email Input */}
                         <div>
                             <label
@@ -158,9 +203,8 @@ const LoginPage = () => {
                                     required
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border ${
-                                        errors.email ? 'border-red-300' : 'border-gray-300'
-                                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500`}
+                                    className={`appearance-none block w-full px-3 py-2 border ${errors.email ? 'border-red-300' : 'border-gray-300'
+                                        } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500`}
                                     placeholder="you@example.com"
                                 />
                                 <Mail className="top-2.5 right-3 absolute w-5 h-5 text-gray-400" />
@@ -189,9 +233,8 @@ const LoginPage = () => {
                                     required
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border ${
-                                        errors.password ? 'border-red-300' : 'border-gray-300'
-                                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500`}
+                                    className={`appearance-none block w-full px-3 py-2 border ${errors.password ? 'border-red-300' : 'border-gray-300'
+                                        } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500`}
                                     placeholder="••••••••"
                                 />
                                 <button
