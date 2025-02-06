@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import { localUrl } from '../components/Url';
 
 const TimeSlot = ({ time, selected, available, onClick }) => (
   <button
@@ -118,7 +119,7 @@ export default function ReservationPage() {
     setCurrentStep(prev => Math.max(prev - 1, 0));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     // Handle reservation submission
     console.log({
@@ -128,6 +129,32 @@ export default function ReservationPage() {
       guests: guestCount,
       ...formData
     });
+    try{
+        // Simulate API call
+        const response = await fetch(`${localUrl}/api/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('token')}` // Replace with your authentication token
+          },
+          body: JSON.stringify({
+            date: selectedDate,
+            time: selectedTime,
+            tableNumber: selectedTable,
+            guests: guestCount,
+           ...formData
+          })
+        });
+        const req = await response.json()
+        if(response.ok) {
+          alert('Reservation successful!');
+          setCurrentStep(0);
+        } else { 
+            alert('Reservation error: '+ req.message);
+            console.log('Reservation error: '+ req.message)
+        }
+  
+    }catch(err){}
   };
 
   return (

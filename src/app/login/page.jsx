@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Eye, EyeOff, ChefHat, Github, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { localUrl } from '../components/Url';
 
 const LoginPage = () => {
     const router = useRouter();
@@ -48,11 +49,33 @@ const LoginPage = () => {
 
         setIsLoading(true);
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // Simulate API call 
+            const res = await fetch(`${localUrl}/api/staff/login`,{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password
+                })
+            })
+            const req = await res.json()
+            if (!req.ok) { 
+                alert('Login error: '+req.message)
+                console.log('Login error: '+req.message)
+                return;
+            }
+            // Set JWT token in local storage
+            localStorage.setItem('jwtToken', req.token);
+            alert("Login succeful!")
+            // Redirect to dashboard page
             router.push('/dashboard');
+            return
         } catch (error) {
             console.error('Login error:', error);
+            alert("Internal erro: "+error.message)
+            return;
         } finally {
             setIsLoading(false);
         }
