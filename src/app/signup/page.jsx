@@ -99,12 +99,12 @@ const RegisterPage = () => {
                 role: formData.role,
                 ...(formData.role === 'Staff' && { salary: Number(formData.salary) })
             };
-            const apiPath = formData.role; 
+            let apiPath = formData.role.toLowerCase();
             // for path if owner /create if staff /make if customer /register
-            const path = submitData.role === 'Owner'? 'register-owner' : submitData.role === 'Staff'?'add' :'register'
+            const path = submitData.role === 'Staff' ? 'add' : 'register'
             // add authorization header if token exists  // for path if owner /create if staff /make if customer /register
             const token = localStorage.getItem('token')
-            const res = await fetch(`${localUrl}/api/${apiPath}/${path}`, {
+            const res = await fetch(`${localUrl}/Api/${apiPath}/${path}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -115,10 +115,10 @@ const RegisterPage = () => {
             const req = await res.json()
             if (!res.ok) {
                 console.log("Registration error: ", req.message)
-                alert("Registration error: ", req.message)
+                alert("Registration error: " + req.message)
                 setErrors(prev => ({
                     ...prev,
-                    submit: 'Registration error' + req.message
+                    submit: 'Registration error: ' + req.message
                 }))
                 return;
             }
@@ -127,7 +127,7 @@ const RegisterPage = () => {
             return
 
         } catch (error) {
-            console.error('Registration error:', error);
+            console.error('Registration error: ', error);
             setErrors(prev => ({
                 ...prev,
                 submit: 'Registration failed. Please try again. ' + error
@@ -217,11 +217,11 @@ const RegisterPage = () => {
                                 name="role"
                                 value={formData.role}
                                 onChange={handleChange}
-                                className="block border-gray-300 focus:border-yellow-500 shadow-sm mt-1 px-3 py-2 border rounded-md w-full focus:outline-none focus:ring-yellow-500 sm:text-sm"
+                                className="block shadow-sm mt-1 px-3 py-2 border border-gray-300 focus:border-yellow-500 rounded-md focus:outline-none focus:ring-yellow-500 w-full sm:text-sm"
                             >
+                                <option value="">Select role</option>
                                 <option value="Customer">Customer</option>
                                 <option value="Staff">Staff</option>
-                                <option value="Owner">Owner</option>
                             </select>
                         </div>
 
@@ -340,7 +340,7 @@ const RegisterPage = () => {
                         )}
 
                         {errors.submit && (
-                            <div className="text-center text-red-600 text-sm">{errors.submit}</div>
+                            <div className="text-red-600 text-sm text-center">{errors.submit}</div>
                         )}
                     </div>
                 );
@@ -356,10 +356,10 @@ const RegisterPage = () => {
                 <div className="flex justify-center">
                     <ChefHat className="w-12 h-12 text-yellow-500" />
                 </div>
-                <h2 className="mt-6 font-bold text-3xl text-center text-gray-900 tracking-tight">
+                <h2 className="mt-6 font-bold text-gray-900 text-3xl text-center tracking-tight">
                     Create your account
                 </h2>
-                <p className="mt-2 text-center text-gray-600 text-sm">
+                <p className="mt-2 text-gray-600 text-sm text-center">
                     Already have an account?{' '}
                     <Link href="/login" className="font-medium text-yellow-600 hover:text-yellow-500">
                         Sign in
@@ -398,7 +398,7 @@ const RegisterPage = () => {
                                 <button
                                     type="button"
                                     onClick={handleBack}
-                                    className="flex-1 border-gray-300 bg-white hover:bg-gray-50 shadow-sm px-4 py-2 border rounded-md focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 font-medium text-gray-700 text-sm focus:outline-none"
+                                    className="flex-1 bg-white hover:bg-gray-50 shadow-sm px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 font-medium text-gray-700 text-sm"
                                 >
                                     Back
                                 </button>
@@ -409,8 +409,8 @@ const RegisterPage = () => {
                                 onClick={currentStep === 3 ? undefined : handleNext}
                                 disabled={submitting}
                                 className={`flex-1 rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${submitting
-                                        ? 'bg-gray-400 cursor-not-allowed'
-                                        : 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500'
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500'
                                     }`}
                             >
                                 {currentStep === 3

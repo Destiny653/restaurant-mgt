@@ -70,6 +70,8 @@ const LoginPage = () => {
             }
             // Set JWT token in local storage
             localStorage.setItem('token', req.token);
+            localStorage.setItem('role', req.data.role);
+            localStorage.setItem('userEmail', req.data.email);
             localStorage.setItem('userRole', formData.role.toLowerCase()); // Store user role
             alert("Login successful!");
             // Redirect to dashboard page
@@ -128,7 +130,7 @@ const LoginPage = () => {
                     <div className="flex justify-center items-center bg-yellow-500 mx-auto rounded-xl w-12 h-12">
                         <ChefHat className="w-8 h-8 text-white" />
                     </div>
-                    <h2 className="mt-6 font-extrabold text-3xl text-gray-900">
+                    <h2 className="mt-6 font-extrabold text-gray-900 text-3xl">
                         Welcome back
                     </h2>
                     <p className="mt-2 text-gray-600 text-sm">
@@ -140,7 +142,7 @@ const LoginPage = () => {
                 <div className="space-y-3">
                     <button
                         type="button"
-                        className="flex justify-center items-center border-gray-300 bg-white hover:bg-gray-50 shadow-sm px-4 py-2 border rounded-lg w-full font-medium text-gray-700 text-sm transition-colors"
+                        className="flex justify-center items-center bg-white hover:bg-gray-50 shadow-sm px-4 py-2 border border-gray-300 rounded-lg w-full font-medium text-gray-700 text-sm transition-colors"
                     >
                         <img
                             className="mr-2 w-5 h-5"
@@ -178,7 +180,7 @@ const LoginPage = () => {
                                 name="role"
                                 value={formData.role}
                                 onChange={handleChange}
-                                className="block border-gray-300 focus:border-yellow-500 shadow-sm mt-1 px-3 py-2 border rounded-lg focus:ring-yellow-500 w-full focus:outline-none"
+                                className="block shadow-sm mt-1 px-3 py-2 border border-gray-300 focus:border-yellow-500 rounded-lg focus:outline-none focus:ring-yellow-500 w-full"
                             >
                                 <option value="customer">Customer</option>
                                 <option value="staff">Staff</option>
@@ -290,7 +292,7 @@ const LoginPage = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="flex justify-center bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 shadow-sm px-4 py-2 border border-transparent rounded-lg focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 w-full font-medium text-sm text-white focus:outline-none transition-colors disabled:cursor-not-allowed"
+                        className="flex justify-center bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 shadow-sm px-4 py-2 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 w-full font-medium text-white text-sm transition-colors disabled:cursor-not-allowed"
                     >
                         {isLoading ? (
                             <div className="flex items-center">

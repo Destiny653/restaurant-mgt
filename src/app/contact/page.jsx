@@ -1,13 +1,15 @@
 'use client'
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
+import { localUrl } from '../components/Url';
 
 const ContactPage = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         subject: '',
-        message: ''
+        message: '',
+        role: 'Customer'
     });
 
     const [submitting, setSubmitting] = useState(false);
@@ -24,23 +26,39 @@ const ContactPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        setSubmitting(false);
-        setSubmitted(true);
-        
-        // Reset form
-        setFormData({
-            name: '',
-            email: '',
-            subject: '',
-            message: ''
-        });
 
-        // Reset success message after 3 seconds
-        setTimeout(() => setSubmitted(false), 3000);
+        // Simulate API call
+        try {
+            const res = await fetch(`${localUrl}/api/customer/message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` // Replace with your authentication token
+                },
+                body: JSON.stringify(formData)
+            })
+            const req = await res.json()
+            if (!res.ok) {
+                alert(req.message)
+                setSubmitting(false);
+                return;
+            }
+            setSubmitting(false);
+            setSubmitted(true);
+            // Reset form
+            setFormData({
+                name: '',
+                email: '',
+                subject: '',
+                message: ''
+            });
+
+        } catch (error) {
+            alert("Error: " + error.message)
+            setSubmitting(false);
+            return;
+        }
+        // Reset success message after 3 seconds 
     };
 
     return (
@@ -59,7 +77,7 @@ const ContactPage = () => {
                     {/* Contact Information */}
                     <div className="bg-white shadow-sm p-8 rounded-xl">
                         <h2 className="mb-6 font-semibold text-2xl">Get in Touch</h2>
-                        
+
                         <div className="space-y-6">
                             <div className="flex items-start">
                                 <div className="flex-shrink-0">
@@ -112,7 +130,7 @@ const ContactPage = () => {
                     {/* Contact Form */}
                     <div className="bg-white shadow-sm p-8 rounded-xl">
                         <h2 className="mb-6 font-semibold text-2xl">Send us a Message</h2>
-                        
+
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
                                 <label htmlFor="name" className="block mb-1 font-medium text-gray-700 text-sm">
@@ -125,7 +143,7 @@ const ContactPage = () => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     required
-                                    className="border-gray-300 px-4 py-2 border focus:border-transparent rounded-lg focus:ring-2 focus:ring-yellow-500 w-full transition outline-none"
+                                    className="px-4 py-2 border border-gray-300 focus:border-transparent rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 w-full transition"
                                     placeholder="John Doe"
                                 />
                             </div>
@@ -141,7 +159,7 @@ const ContactPage = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     required
-                                    className="border-gray-300 px-4 py-2 border focus:border-transparent rounded-lg focus:ring-2 focus:ring-yellow-500 w-full transition outline-none"
+                                    className="px-4 py-2 border border-gray-300 focus:border-transparent rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 w-full transition"
                                     placeholder="john@example.com"
                                 />
                             </div>
@@ -150,16 +168,18 @@ const ContactPage = () => {
                                 <label htmlFor="subject" className="block mb-1 font-medium text-gray-700 text-sm">
                                     Subject
                                 </label>
-                                <input
-                                    type="text"
-                                    id="subject"
+                                <select
                                     name="subject"
                                     value={formData.subject}
-                                    onChange={handleChange}
-                                    required
-                                    className="border-gray-300 px-4 py-2 border focus:border-transparent rounded-lg focus:ring-2 focus:ring-yellow-500 w-full transition outline-none"
-                                    placeholder="How can we help?"
-                                />
+                                    onChange={handleChange} id="subject"
+                                    className="px-4 py-2 border border-gray-300 focus:border-transparent rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 w-full transition"
+                                >
+                                    <option value="">Choose subject</option>
+                                    <option value="request">Request</option>
+                                    <option value="feedback">Feedback</option>
+                                    <option value="inquiry">Inquiry</option>
+                                    <option value="complaint">Complaint</option>
+                                </select>
                             </div>
 
                             <div>
@@ -173,7 +193,7 @@ const ContactPage = () => {
                                     onChange={handleChange}
                                     required
                                     rows={4}
-                                    className="border-gray-300 px-4 py-2 border focus:border-transparent rounded-lg focus:ring-2 focus:ring-yellow-500 w-full transition outline-none"
+                                    className="px-4 py-2 border border-gray-300 focus:border-transparent rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 w-full transition"
                                     placeholder="Your message here..."
                                 />
                             </div>
@@ -182,8 +202,8 @@ const ContactPage = () => {
                                 type="submit"
                                 disabled={submitting}
                                 className={`w-full flex items-center justify-center px-6 py-3 rounded-lg text-white font-medium
-                                    ${submitting 
-                                        ? 'bg-gray-400 cursor-not-allowed' 
+                                    ${submitting
+                                        ? 'bg-gray-400 cursor-not-allowed'
                                         : 'bg-yellow-500 hover:bg-yellow-600 transition-colors'
                                     }`}
                             >
@@ -198,7 +218,7 @@ const ContactPage = () => {
                             </button>
 
                             {submitted && (
-                                <div className="mt-4 text-center text-green-600">
+                                <div className="mt-4 text-green-600 text-center">
                                     Thank you! Your message has been sent successfully.
                                 </div>
                             )}

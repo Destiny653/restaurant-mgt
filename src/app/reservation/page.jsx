@@ -1,11 +1,11 @@
 'use client'
 import React, { useState } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
-  Table, 
-  ChevronLeft, 
+import {
+  Calendar,
+  Clock,
+  Users,
+  Table,
+  ChevronLeft,
   ChevronRight,
   Info,
   Check
@@ -48,31 +48,28 @@ const TableSelection = ({ tableNumber, selected, available, seats, onClick }) =>
 
 const ReservationSteps = ({ currentStep }) => {
   const steps = ['Date & Time', 'Table Selection', 'Guest Details', 'Confirmation'];
-  
+
   return (
-    <div className="md:flex justify-center items-center hidden mb-8">
+    <div className="hidden md:flex justify-center items-center mb-8">
       {steps.map((step, index) => (
         <React.Fragment key={step}>
           <div className="flex items-center">
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-              index <= currentStep ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-            }`}>
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${index <= currentStep ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+              }`}>
               {index < currentStep ? (
                 <Check className="w-5 h-5" />
               ) : (
                 <span>{index + 1}</span>
               )}
             </div>
-            <span className={`ml-2 text-sm font-medium ${
-              index <= currentStep ? 'text-gray-900' : 'text-gray-500'
-            }`}>
+            <span className={`ml-2 text-sm font-medium ${index <= currentStep ? 'text-gray-900' : 'text-gray-500'
+              }`}>
               {step}
             </span>
           </div>
           {index < steps.length - 1 && (
-            <div className={`w-24 h-0.5 mx-2 ${
-              index < currentStep ? 'bg-blue-600' : 'bg-gray-200'
-            }`} />
+            <div className={`w-24 h-0.5 mx-2 ${index < currentStep ? 'bg-blue-600' : 'bg-gray-200'
+              }`} />
           )}
         </React.Fragment>
       ))}
@@ -90,6 +87,7 @@ export default function ReservationPage() {
     name: '',
     email: '',
     phone: '',
+    role: '',
     specialRequests: ''
   });
 
@@ -119,7 +117,7 @@ export default function ReservationPage() {
     setCurrentStep(prev => Math.max(prev - 1, 0));
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle reservation submission
     console.log({
@@ -129,32 +127,32 @@ export default function ReservationPage() {
       guests: guestCount,
       ...formData
     });
-    try{
-        // Simulate API call
-        const response = await fetch(`${localUrl}/api/orders`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `${localStorage.getItem('token')}` // Replace with your authentication token
-          },
-          body: JSON.stringify({
-            date: selectedDate,
-            time: selectedTime,
-            tableNumber: selectedTable,
-            guests: guestCount,
-           ...formData
-          })
-        });
-        const req = await response.json()
-        if(response.ok) {
-          alert('Reservation successful!');
-          setCurrentStep(0);
-        } else { 
-            alert('Reservation error: '+ req.message);
-            console.log('Reservation error: '+ req.message)
-        }
-  
-    }catch(err){}
+    try {
+      // Simulate API call
+      const response = await fetch(`${localUrl}/api/reservation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${localStorage.getItem('token')}` // Replace with your authentication token
+        },
+        body: JSON.stringify({
+          date: selectedDate,
+          time: selectedTime,
+          tableNumber: selectedTable,
+          guests: guestCount,
+          ...formData
+        })
+      });
+      const req = await response.json()
+      if (response.ok) {
+        alert('Reservation successful!');
+        setCurrentStep(0);
+      } else {
+        alert('Reservation error: ' + req.message);
+        console.log('Reservation error: ' + req.message)
+      }
+
+    } catch (err) { }
   };
 
   return (
@@ -163,7 +161,7 @@ export default function ReservationPage() {
       <header className="bg-white shadow-sm">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex justify-between items-center h-16">
-            <h1 className="font-bold text-2xl text-gray-900">Make a Reservation</h1>
+            <h1 className="font-bold text-gray-900 text-2xl">Make a Reservation</h1>
             <div className="flex items-center space-x-2 text-gray-600">
               <Info className="w-5 h-5" />
               <span className="text-sm">Need help? Call (123) 456-7890</span>
@@ -189,7 +187,7 @@ export default function ReservationPage() {
                       selected={selectedDate}
                       onChange={date => setSelectedDate(date)}
                       minDate={new Date()}
-                      className="border-2 border-gray-200 px-4 py-2 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
+                      className="px-4 py-2 border-2 border-gray-200 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
                       placeholderText="Select a date"
                     />
                     <Calendar className="top-2.5 right-3 absolute w-5 h-5 text-gray-400" />
@@ -203,14 +201,14 @@ export default function ReservationPage() {
                   <div className="flex items-center space-x-4">
                     <button
                       onClick={() => setGuestCount(prev => Math.max(1, prev - 1))}
-                      className="border-2 border-gray-200 hover:bg-gray-50 p-2 rounded-lg"
+                      className="hover:bg-gray-50 p-2 border-2 border-gray-200 rounded-lg"
                     >
                       <ChevronLeft className="w-5 h-5" />
                     </button>
-                    <span className="w-16 font-medium text-center text-lg">{guestCount}</span>
+                    <span className="w-16 font-medium text-lg text-center">{guestCount}</span>
                     <button
                       onClick={() => setGuestCount(prev => Math.min(8, prev + 1))}
-                      className="border-2 border-gray-200 hover:bg-gray-50 p-2 rounded-lg"
+                      className="hover:bg-gray-50 p-2 border-2 border-gray-200 rounded-lg"
                     >
                       <ChevronRight className="w-5 h-5" />
                     </button>
@@ -258,7 +256,7 @@ export default function ReservationPage() {
                   <div>
                     <h4 className="font-medium text-blue-900">Table Information</h4>
                     <p className="text-blue-700 text-sm">
-                      Tables are assigned based on party size and availability. 
+                      Tables are assigned based on party size and availability.
                       We'll do our best to accommodate your preferred seating.
                     </p>
                   </div>
@@ -278,8 +276,8 @@ export default function ReservationPage() {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="border-2 border-gray-200 px-4 py-2 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="px-4 py-2 border-2 border-gray-200 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
                     placeholder="John Doe"
                   />
                 </div>
@@ -290,22 +288,41 @@ export default function ReservationPage() {
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="border-2 border-gray-200 px-4 py-2 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="px-4 py-2 border-2 border-gray-200 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
                     placeholder="john@example.com"
                   />
                 </div>
-                <div>
-                  <label className="block mb-2 font-medium text-gray-700 text-sm">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="border-2 border-gray-200 px-4 py-2 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
-                    placeholder="(123) 456-7890"
-                  />
+                <div className='flex flex-col gap-6'>
+                  <section>
+                    <label className="block mb-2 font-medium text-gray-700 text-sm">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="px-4 py-2 border-2 border-gray-200 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
+                      placeholder="(123) 456-7890"
+                    />
+                  </section>
+                  <section>
+                    <label htmlFor="role" className="block mb-2 font-medium text-gray-700 text-sm">
+                      Role
+                    </label>
+                    <select
+                      id="role"
+                      name="role"
+                      value={formData.role}
+                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                      className="px-4 py-2 border-2 border-gray-200 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
+                    >
+                      <option value="">Select role</option>
+                      <option value="Customer">Customer</option>
+                      <option value="Staff">Staff</option>
+                      <option value="Owner">Owner</option>
+                    </select>
+                  </section>
                 </div>
                 <div>
                   <label className="block mb-2 font-medium text-gray-700 text-sm">
@@ -313,8 +330,8 @@ export default function ReservationPage() {
                   </label>
                   <textarea
                     value={formData.specialRequests}
-                    onChange={(e) => setFormData({...formData, specialRequests: e.target.value})}
-                    className="border-2 border-gray-200 px-4 py-2 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
+                    onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
+                    className="px-4 py-2 border-2 border-gray-200 focus:border-transparent rounded-lg focus:ring-2 focus:ring-blue-500 w-full"
                     placeholder="Any special requests or dietary requirements?"
                     rows={4}
                   />
@@ -378,7 +395,7 @@ export default function ReservationPage() {
             {currentStep > 0 && (
               <button
                 onClick={handlePrevStep}
-                className="border-2 border-gray-200 hover:bg-gray-50 px-6 py-2 rounded-lg font-medium"
+                className="hover:bg-gray-50 px-6 py-2 border-2 border-gray-200 rounded-lg font-medium"
               >
                 Back
               </button>
