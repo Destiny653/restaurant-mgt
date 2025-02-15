@@ -1,2 +1,2 @@
-// export const localUrl = 'https://restaurant-management-kwmw.onrender.com'
-export const localUrl = 'http://localhost:3000'
+export const localUrl = 'https://restaurant-management-kwmw.onrender.com'
+// export const localUrl = 'http://localhost:3000'
